@@ -82,7 +82,7 @@ class MarketReaderModel
             ) q ON (p.ts=q.max_ts AND p.market_id=q.market_id)
             LEFT JOIN markets m ON p.market_id=m.market_id
             LEFT JOIN exchanges e ON m.exchange_id=e.exchange_id
-            WHERE m.currency_id=:currency
+            WHERE m.currency_id=:currency AND p.volume > 0
             ORDER BY p.volume DESC'
         );
         $st->bindValue(':currency', $currency);
@@ -101,7 +101,8 @@ class MarketReaderModel
 
         $ret['ts']   = $ts;
         $ret['date'] = date('jS F Y, H:i (T)', $ts);
-        $ret['vwap'] = sprintf('%.8f', $total / $volume);
+        $ret['vwap'] = sprintf('%.8f', ($volume ? ($total / $volume) : 0));
+        $ret['vol']  = $volume;
 
         return $ret;
     }
@@ -110,7 +111,7 @@ class MarketReaderModel
     {
         $ts = time();
         $st = $this->dbc->prepare(
-            'SELECT (SUM(p.price * p.volume) / SUM(p.volume)) AS vwap, p.ts FROM prices p
+            'SELECT (SUM(p.price * p.volume) / SUM(p.volume)) AS vwap, p.volume, p.ts FROM prices p
             LEFT JOIN markets m ON p.market_id=m.market_id
             LEFT JOIN exchanges e ON m.exchange_id=e.exchange_id
             WHERE m.currency_id=:currency AND p.ts BETWEEN :start AND :end

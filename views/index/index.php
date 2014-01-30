@@ -15,7 +15,7 @@
  <span id="curr_date"><?=$this->data['date']?></span>
 </p>
 <ul class="currencies">
- <?php $i=0; $currencies=array('BTC','LTC','USD','GBP','EUR','CNY','AUD'); foreach ($currencies as $c): $i++; ?>
+ <?php $i=0; $currencies=array('BTC','LTC','USD','CAD','GBP','EUR','CNY','AUD'); foreach ($currencies as $c): $i++; ?>
  <li class="<?=$this->data['currency_code']==$c?'curr':''?>"><a href="/<?=$c?>"><?=$c?></a></li>
  <?php endforeach; ?>
 </ul>
